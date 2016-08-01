@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="xsp-I9-7wU">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="10085"/>
+    </dependencies>
+    <scenes>
+        <!--Settings-->
+        <scene sceneID="U5c-wp-Bfw">
+            <objects>
+                <viewController id="4E8-Dt-9wN" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="cdZ-GG-Osr"/>
+                        <viewControllerLayoutGuide type="bottom" id="Y98-e5-pVx"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="nc9-gc-jaY">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Settings" image="ic_settings" id="pek-EH-sGN"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="4JD-nu-0Hx" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="826" y="724"/>
+        </scene>
+        <!--Play-->
+        <scene sceneID="d4u-EX-TTl">
+            <objects>
+                <viewController id="xf3-XU-Eds" customClass="PlayViewController" customModule="Breakout_" customModuleProvider="target" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="heZ-ki-pYV"/>
+                        <viewControllerLayoutGuide type="bottom" id="cx6-pv-z9l"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="E2S-5X-jgt">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="HrX-Pg-sGU" customClass="PlayView" customModule="Breakout_" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="551"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="HrX-Pg-sGU" firstAttribute="bottom" secondItem="cx6-pv-z9l" secondAttribute="top" id="Pxa-Fo-6rj"/>
+                            <constraint firstAttribute="trailing" secondItem="HrX-Pg-sGU" secondAttribute="trailing" id="VaN-aV-5nj"/>
+                            <constraint firstItem="HrX-Pg-sGU" firstAttribute="leading" secondItem="E2S-5X-jgt" secondAttribute="leading" id="v2g-5q-ngo"/>
+                            <constraint firstItem="HrX-Pg-sGU" firstAttribute="top" secondItem="E2S-5X-jgt" secondAttribute="top" id="zss-fa-sFh"/>
+                        </constraints>
+                    </view>
+                    <tabBarItem key="tabBarItem" title="Play" image="ic_local_taxi" id="5LL-xx-dc3"/>
+                    <connections>
+                        <outlet property="playView" destination="HrX-Pg-sGU" id="jjf-AN-fQC"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mxi-x5-FAF" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="826" y="63"/>
+        </scene>
+        <!--Nonrotatable View Controller-->
+        <scene sceneID="8lm-ze-5Ui">
+            <objects>
+                <tabBarController id="xsp-I9-7wU" customClass="NonrotatableViewController" customModule="Breakout_" customModuleProvider="target" sceneMemberID="viewController">
+                    <tabBar key="tabBar" contentMode="scaleToFill" id="5Qp-1W-lFQ">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    </tabBar>
+                    <connections>
+                        <segue destination="xf3-XU-Eds" kind="relationship" relationship="viewControllers" id="8Q1-ce-KNZ"/>
+                        <segue destination="4E8-Dt-9wN" kind="relationship" relationship="viewControllers" id="1no-gb-FEy"/>
+                    </connections>
+                </tabBarController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="bQg-PD-GYn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="6" y="394"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="ic_local_taxi" width="24" height="24"/>
+        <image name="ic_settings" width="24" height="24"/>
+    </resources>
+</document>
