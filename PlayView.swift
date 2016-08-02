@@ -11,8 +11,8 @@ import UIKit
 class PlayView: UIView, UICollisionBehaviorDelegate {
 	private struct Constants {
 		// Constants related to Bricks
-		static let BricksPerRow = 8
-		static let BrickRows = 6
+		static let BricksPerRow = 10
+		static let BrickRows = 5
 		static let BrickHeight: CGFloat = 20
 		static let TopOffset: CGFloat = 60
 		static let BrickColor: UIColor = UIColor.redColor()
@@ -29,19 +29,53 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	private struct Identifiers {
 		static let PaddleBoundaryIdentifier = "paddle boundary"
 	}
+	private var showingCoverView = true {
+		didSet {
+			if !showingCoverView {
+				removeViewWithAnimation(coverView)
+				removeViewWithAnimation(coverText)
+				isPlaying = true
+			}
+		}
+	}
+	private var isPlaying = false {
+		didSet {
+			if isPlaying {
+				continueGame()
+			}
+		}
+	}
+	private var coverView: UIView!
+	private var coverText: UILabel!
+	func showCoverViewWithText(textToDisplay: String) {
+		coverView = UIView(frame: frame)
+		coverView.backgroundColor = UIColor.blackColor()
+		coverView.alpha = 0.85
+		addSubview(coverView)
+		coverText = UILabel()
+		coverText.text = textToDisplay
+		coverText.font = coverText.font?.fontWithSize(30)
+		coverText.textColor = UIColor.whiteColor()
+		coverText.sizeToFit()
+		coverText.frame.origin = CGPoint(x: coverView.frame.midX - coverText.frame.width / 2, y: coverView.frame.midY - coverText.frame.height / 2)
+		addSubview(coverText)
+	}
 	
 	func initializeGame() {
-		prepareForBircks()
+		prepareForBricks()
 		preparePaddle()
 		prepareTheBall()
+		showCoverViewWithText("Touch to play")
 	}
 	
 	func pauseGame() {
 		behavior.pauseGame(itemNeedsToBePaused: ballView)
+		showCoverViewWithText("Pause")
+		showingCoverView = true
 	}
 	
 	func continueGame() {
-		behavior.continueGame(itemNeedsToBePaused: ballView)
+		behavior.continueGame(itemNeedsToBeContinued: ballView)
 	}
 	
 	// behavior and animator
@@ -60,7 +94,6 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	private lazy var behavior: BreakoutBehavior = {
 		let behavior = BreakoutBehavior()
 		behavior.collider.collisionDelegate = self
-		
 		return behavior
 	}()
 	
@@ -69,19 +102,12 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		if let id = identifier as? String {
 			if id.rangeOfString("brick") != nil {
 				if let brick = bricks[id] {
-					UIView.animateWithDuration(
-						0.3,
-						delay: 0.0,
-						options: [UIViewAnimationOptions.CurveLinear],
-						animations: {
-							brick.alpha = CGFloat(0.0)
-						},
-						completion: {
-							if $0 {
-								brick.removeFromSuperview()
-							}
-						})
+					removeViewWithAnimation(brick)
+					bricks.removeValueForKey(id)
 					behavior.removeBoundaryWithIdentifier(id)
+				}
+				if bricks.count <= 0 {
+					print("nb")
 				}
 			}
 		} else {
@@ -90,6 +116,22 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 				print("Sb")
 			}
  		}
+	}
+	
+	// private method used to remove the brick with animation
+	private func removeViewWithAnimation(view: UIView) {
+		UIView.animateWithDuration(
+			0.3,
+			delay: 0.0,
+			options: [UIViewAnimationOptions.CurveLinear],
+			animations: {
+				view.alpha = CGFloat(0.0)
+			},
+			completion: {
+				if $0 {
+					view.removeFromSuperview()
+				}
+		})
 	}
 	
 	// ball view
@@ -116,7 +158,7 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	}
 	
 	
-	func prepareForBircks() {
+	func prepareForBricks() {
 		for rowNumber in 0..<Constants.BrickRows {
 			for colNumber in 0..<Constants.BricksPerRow {
 				drawBrickAtPosition(CGFloat(colNumber) * brickWidth, y: Constants.TopOffset + CGFloat(rowNumber) * Constants.BrickHeight)
@@ -189,7 +231,18 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		}
 	}
 	//		Tap
-	func pushTheBall(recognizer: UITapGestureRecognizer) {
+	func userTapScreen(recognizer: UITapGestureRecognizer) {
+		if showingCoverView {
+			if recognizer.state == .Ended {
+				showingCoverView = false
+				animating = true
+			}
+		} else if isPlaying {
+			pushTheBall(recognizer)
+		}
+	}
+	
+	private func pushTheBall(recognizer: UITapGestureRecognizer) {
 		switch recognizer.state {
 		case .Ended:
 			addPushBehavior()

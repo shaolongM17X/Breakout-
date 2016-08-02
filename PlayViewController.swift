@@ -19,7 +19,7 @@ class PlayViewController: UIViewController {
 	@IBOutlet weak var playView: PlayView! {
 		didSet {
 			playView.addGestureRecognizer(UIPanGestureRecognizer(target: playView, action: #selector(PlayView.moveThePaddle(_:))))
-			playView.addGestureRecognizer(UITapGestureRecognizer(target: playView, action: #selector(playView.pushTheBall(_:))))
+			playView.addGestureRecognizer(UITapGestureRecognizer(target: playView, action: #selector(playView.userTapScreen(_:))))
 		}
 	}
 	
@@ -30,11 +30,7 @@ class PlayViewController: UIViewController {
 		if initialize {
 			playView.initializeGame()
 			initialize = false
-			playView.animating = true
-		} else {
-			playView.continueGame()
-		}
-		
+		}		
 	}
 	
 	override func viewWillDisappear(animated: Bool) {

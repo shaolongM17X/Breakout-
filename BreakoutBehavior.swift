@@ -45,7 +45,7 @@ class BreakoutBehavior: UIDynamicBehavior {
 		ballItemBehavior.addLinearVelocity(negativeVelocity, forItem: item)
 		ballItemBehavior.addAngularVelocity(negativeAngularVelocity, forItem: item)
 	}
-	func continueGame(itemNeedsToBePaused item: UIDynamicItem) {
+	func continueGame(itemNeedsToBeContinued item: UIDynamicItem) {
 		if let velocity = ballLinearVelocity, angularVelocity = ballAngularVelocity {
 			addChildBehavior(gravity)
 			ballItemBehavior.addLinearVelocity(velocity, forItem: item)
