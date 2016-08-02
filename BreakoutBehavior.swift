@@ -32,6 +32,12 @@ class BreakoutBehavior: UIDynamicBehavior {
 		ballItemBehavior.addItem(ball)
 	}
 	
+	func removeBall(ball: UIDynamicItem) {
+		gravity.removeItem(ball)
+		collider.removeItem(ball)
+		ballItemBehavior.removeItem(ball)
+	}
+	
 	// dealing with pausing and continuing game
 	private var ballLinearVelocity: CGPoint?
 	private var ballAngularVelocity: CGFloat?

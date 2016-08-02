@@ -11,8 +11,8 @@ import UIKit
 class PlayView: UIView, UICollisionBehaviorDelegate {
 	private struct Constants {
 		// Constants related to Bricks
-		static let BricksPerRow = 10
-		static let BrickRows = 5
+		static let BricksPerRow = 1
+		static let BrickRows = 1
 		static let BrickHeight: CGFloat = 20
 		static let TopOffset: CGFloat = 60
 		static let BrickColor: UIColor = UIColor.redColor()
@@ -35,19 +35,45 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 				removeViewWithAnimation(coverView)
 				removeViewWithAnimation(coverText)
 				isPlaying = true
+			} else {
+				isPlaying = false
 			}
 		}
 	}
 	private var isPlaying = false {
 		didSet {
 			if isPlaying {
+				animating = true
 				continueGame()
+			}
+		}
+	}
+	private var gameOver = false {
+		didSet {
+			if gameOver {
+				animating = false
+				showCoverViewWithText("Oh oh..Touch to restart")
+			} else {
+				showingCoverView = false
+				initializeGame()
+			}
+		}
+	}
+	private var winning = false {
+		didSet {
+			if winning {
+				animating = false
+				showCoverViewWithText("You win!")
+			} else {
+				showingCoverView = false
+				initializeGame()
 			}
 		}
 	}
 	private var coverView: UIView!
 	private var coverText: UILabel!
-	func showCoverViewWithText(textToDisplay: String) {
+	private func showCoverViewWithText(textToDisplay: String) {
+		showingCoverView = true
 		coverView = UIView(frame: frame)
 		coverView.backgroundColor = UIColor.blackColor()
 		coverView.alpha = 0.85
@@ -65,16 +91,18 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		prepareForBricks()
 		preparePaddle()
 		prepareTheBall()
+		animator.addBehavior(behavior)
 		showCoverViewWithText("Touch to play")
 	}
 	
 	func pauseGame() {
-		behavior.pauseGame(itemNeedsToBePaused: ballView)
-		showCoverViewWithText("Pause")
-		showingCoverView = true
+		if isPlaying {
+			behavior.pauseGame(itemNeedsToBePaused: ballView)
+			showCoverViewWithText("Pause")
+		}
 	}
 	
-	func continueGame() {
+	private func continueGame() {
 		behavior.continueGame(itemNeedsToBeContinued: ballView)
 	}
 	
@@ -83,9 +111,9 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	var animating = false {
 		didSet {
 			if animating {
-				animator.addBehavior(behavior)
+				behavior.addBall(ballView)
 			} else {
-				animator.removeBehavior(behavior)
+				behavior.removeBall(ballView)
 			}
 		}
 	}
@@ -107,13 +135,13 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 					behavior.removeBoundaryWithIdentifier(id)
 				}
 				if bricks.count <= 0 {
-					print("nb")
+					winning = true
 				}
 			}
 		} else {
 			// we hit one of the boundary.
 			if ballView.frame.maxY > paddleY {
-				print("Sb")
+				gameOver = true
 			}
  		}
 	}
@@ -140,12 +168,15 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	}
 	private var ballView: UIView!
 	func prepareTheBall() {
+		if ballView != nil {
+			ballView.removeFromSuperview()
+			behavior.removeBall(ballView)
+		}
 		let frame = CGRect(origin: CGPoint(x: bounds.midX, y: bounds.midY), size: ballSize)
 		ballView = UIView(frame: frame)
 		ballView.layer.cornerRadius = frame.width / 2
 		ballView.backgroundColor = UIColor.blackColor()
 		addSubview(ballView)
-		behavior.addBall(ballView)
 	}
 	
 	// brick view 
@@ -168,19 +199,22 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 
 	
 	private func drawBrickAtPosition(x: CGFloat, y: CGFloat) {
-		let frame = CGRect(origin: CGPoint(x: x,y: y), size: brickSize)
-		let brick = UIView(frame: frame)
-		
-		
-		brick.backgroundColor = Constants.BrickColor
-		brick.layer.borderWidth = 1
-		brick.layer.borderColor = UIColor.blackColor().CGColor
-		addSubview(brick)
-		
-		let path = UIBezierPath(rect: frame)
 		let identifier = "brick with x: \(x) and y: \(y)"
-		behavior.addBarrier(path, named: identifier)
-		bricks[identifier] = brick
+		if bricks[identifier] == nil {
+			let frame = CGRect(origin: CGPoint(x: x,y: y), size: brickSize)
+			let brick = UIView(frame: frame)
+			
+			
+			brick.backgroundColor = Constants.BrickColor
+			brick.layer.borderWidth = 1
+			brick.layer.borderColor = UIColor.blackColor().CGColor
+			addSubview(brick)
+			
+			let path = UIBezierPath(rect: frame)
+			
+			behavior.addBarrier(path, named: identifier)
+			bricks[identifier] = brick
+		}
 	}
 	
 	// paddle
@@ -232,13 +266,16 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	}
 	//		Tap
 	func userTapScreen(recognizer: UITapGestureRecognizer) {
-		if showingCoverView {
-			if recognizer.state == .Ended {
+		if gameOver {
+			gameOver = false
+		} else if winning {
+			winning = false
+		} else {
+			if showingCoverView {
 				showingCoverView = false
-				animating = true
+			} else if isPlaying {
+				pushTheBall(recognizer)
 			}
-		} else if isPlaying {
-			pushTheBall(recognizer)
 		}
 	}
 	
