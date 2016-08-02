@@ -23,20 +23,23 @@ class PlayViewController: UIViewController {
 		}
 	}
 	
-	private func initializeGame() {
-		playView.prepareForBircks()
-		playView.preparePaddle()
-		playView.prepareTheBall()
-		playView.animating = true
-	}	
 	
+	private var initialize = true
 	override func viewDidAppear(animated: Bool) {
 		super.viewDidAppear(animated)
-		initializeGame()
+		if initialize {
+			playView.initializeGame()
+			initialize = false
+			playView.animating = true
+		} else {
+			playView.continueGame()
+		}
+		
 	}
 	
 	override func viewWillDisappear(animated: Bool) {
-		
+		super.viewWillDisappear(animated)
+		playView.pauseGame()
 	}
 	
 	

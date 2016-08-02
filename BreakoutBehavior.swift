@@ -9,45 +9,61 @@
 import UIKit
 
 class BreakoutBehavior: UIDynamicBehavior {
-	private let gravity = UIGravityBehavior()
+	private let gravity: UIGravityBehavior = {
+		let gravity = UIGravityBehavior()
+		gravity.magnitude = 0.1
+		return gravity
+	}()
 	let collider: UICollisionBehavior = {
 		let collider = UICollisionBehavior()
 		collider.translatesReferenceBoundsIntoBoundary = true
 		return collider
 	}()
-	private let itemBehavior: UIDynamicItemBehavior = {
+	private let ballItemBehavior: UIDynamicItemBehavior = {
 		let dib = UIDynamicItemBehavior()
 		dib.elasticity = 1
+		dib.allowsRotation = false
 		return dib
 	}()
 	
-	func addItemWithIdentifier(item: UIDynamicItem, withIdentifier identifier: String) {
-		if identifier == Identifiers.BallIdentifier {
-			gravity.addItem(item)
-			collider.addItem(item)
-			itemBehavior.addItem(item)
-		} else {
-			
-		}
-		
+	func addBall(ball: UIDynamicItem) {
+		gravity.addItem(ball)
+		collider.addItem(ball)
+		ballItemBehavior.addItem(ball)
 	}
 	
-	func removeItemWithIdentifier(item: UIDynamicItem, withIdentifier identifier: String) {
-		if identifier == Identifiers.BallIdentifier {
-			gravity.removeItem(item)
+	// dealing with pausing and continuing game
+	private var ballLinearVelocity: CGPoint?
+	private var ballAngularVelocity: CGFloat?
+	
+	func pauseGame(itemNeedsToBePaused item: UIDynamicItem) {
+		removeChildBehavior(gravity)
+		ballLinearVelocity = ballItemBehavior.linearVelocityForItem(item)
+		ballAngularVelocity = ballItemBehavior.angularVelocityForItem(item)
+		let negativeVelocity = CGPoint(x: -ballLinearVelocity!.x, y: -ballLinearVelocity!.y)
+		let negativeAngularVelocity = -ballAngularVelocity!
+		ballItemBehavior.addLinearVelocity(negativeVelocity, forItem: item)
+		ballItemBehavior.addAngularVelocity(negativeAngularVelocity, forItem: item)
+	}
+	func continueGame(itemNeedsToBePaused item: UIDynamicItem) {
+		if let velocity = ballLinearVelocity, angularVelocity = ballAngularVelocity {
+			addChildBehavior(gravity)
+			ballItemBehavior.addLinearVelocity(velocity, forItem: item)
+			ballItemBehavior.addAngularVelocity(angularVelocity, forItem: item)
+			
 		}
-		collider.removeItem(item)
 	}
 	
 	override init() {
 		super.init()
 		addChildBehavior(gravity)
 		addChildBehavior(collider)
-		addChildBehavior(itemBehavior)
+		addChildBehavior(ballItemBehavior)
 	}
 	
 	func addBarrier(path: UIBezierPath, named name: String) {
 		collider.removeBoundaryWithIdentifier(name)
 		collider.addBoundaryWithIdentifier(name, forPath: path)
 	}
+
 }

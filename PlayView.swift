@@ -15,6 +15,7 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		static let BrickRows = 6
 		static let BrickHeight: CGFloat = 20
 		static let TopOffset: CGFloat = 60
+		static let BrickColor: UIColor = UIColor.redColor()
 		// Constants related to Paddle
 		static let BottomOffset: CGFloat = 30
 		static let PaddleWidth: CGFloat = 60
@@ -22,7 +23,25 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		// Constants related to Ball
 		static let BallRadius: CGFloat = 10
 		// Constants with push behavior
-		static let PushMagnitude: CGFloat = 0.5
+		static let PushMagnitude: CGFloat = 0.2
+	}
+	
+	private struct Identifiers {
+		static let PaddleBoundaryIdentifier = "paddle boundary"
+	}
+	
+	func initializeGame() {
+		prepareForBircks()
+		preparePaddle()
+		prepareTheBall()
+	}
+	
+	func pauseGame() {
+		behavior.pauseGame(itemNeedsToBePaused: ballView)
+	}
+	
+	func continueGame() {
+		behavior.continueGame(itemNeedsToBePaused: ballView)
 	}
 	
 	// behavior and animator
@@ -41,20 +60,36 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	private lazy var behavior: BreakoutBehavior = {
 		let behavior = BreakoutBehavior()
 		behavior.collider.collisionDelegate = self
+		
 		return behavior
 	}()
 	
 	
 	func collisionBehavior(behavior: UICollisionBehavior, endedContactForItem item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?) {
-		if let _id = identifier {
-			let id = String(_id)
+		if let id = identifier as? String {
 			if id.rangeOfString("brick") != nil {
 				if let brick = bricks[id] {
-					brick.removeFromSuperview()
+					UIView.animateWithDuration(
+						0.3,
+						delay: 0.0,
+						options: [UIViewAnimationOptions.CurveLinear],
+						animations: {
+							brick.alpha = CGFloat(0.0)
+						},
+						completion: {
+							if $0 {
+								brick.removeFromSuperview()
+							}
+						})
 					behavior.removeBoundaryWithIdentifier(id)
 				}
 			}
-		}
+		} else {
+			// we hit one of the boundary.
+			if ballView.frame.maxY > paddleY {
+				print("Sb")
+			}
+ 		}
 	}
 	
 	// ball view
@@ -65,9 +100,10 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	func prepareTheBall() {
 		let frame = CGRect(origin: CGPoint(x: bounds.midX, y: bounds.midY), size: ballSize)
 		ballView = UIView(frame: frame)
+		ballView.layer.cornerRadius = frame.width / 2
 		ballView.backgroundColor = UIColor.blackColor()
 		addSubview(ballView)
-		behavior.addItemWithIdentifier(ballView, withIdentifier: Identifiers.BallIdentifier)
+		behavior.addBall(ballView)
 	}
 	
 	// brick view 
@@ -94,11 +130,11 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		let brick = UIView(frame: frame)
 		
 		
-		brick.backgroundColor = UIColor.redColor()
+		brick.backgroundColor = Constants.BrickColor
 		brick.layer.borderWidth = 1
 		brick.layer.borderColor = UIColor.blackColor().CGColor
 		addSubview(brick)
-		behavior.addItemWithIdentifier(brick, withIdentifier: Identifiers.BricksIdentifier)
+		
 		let path = UIBezierPath(rect: frame)
 		let identifier = "brick with x: \(x) and y: \(y)"
 		behavior.addBarrier(path, named: identifier)
@@ -125,7 +161,6 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		paddle!.layer.borderWidth = 1
 		paddle!.layer.borderColor = UIColor.blackColor().CGColor
 		addSubview(paddle!)
-		behavior.addItemWithIdentifier(paddle!, withIdentifier: Identifiers.PaddleIdentifier)
 		
 		let path = UIBezierPath(rect: frame)
 		behavior.addBarrier(path, named: Identifiers.PaddleBoundaryIdentifier)
@@ -166,7 +201,7 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	private func addPushBehavior() {
 		let pushBehavior = UIPushBehavior(items: [ballView], mode: .Instantaneous)
 		pushBehavior.magnitude = Constants.PushMagnitude
-		pushBehavior.angle = CGFloat(-M_PI / 2)
+		pushBehavior.angle = CGFloat(-M_PI / 3)
 		pushBehavior.action = { [unowned pushBehavior] in
 			pushBehavior.dynamicAnimator!.removeBehavior(pushBehavior)
 		}
