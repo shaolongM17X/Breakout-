@@ -6,4 +6,4 @@ It's a normal breakout game
 <img src="setting.gif" width="350">
 We can configure things in the game like the radius of the ball, gravity, number of bricks, etc.
 <img src="gravity.gif" width="350">
-Of course we can also let the bricks affected by gravity..
+Of course we can also let the bricks affected by gravity.. 
