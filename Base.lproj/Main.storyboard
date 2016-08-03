@@ -14,11 +14,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
-                        <button key="tableFooterView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="VHW-id-EGV">
-                            <rect key="frame" x="0.0" y="577.5" width="600" height="44"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <state key="normal" title="I'm feeling lucky!"/>
-                        </button>
                         <sections>
                             <tableViewSection headerTitle="Bricks" id="cFo-lz-A92">
                                 <cells>
@@ -144,11 +139,15 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="0fr-Ch-lEb">
-                                                    <rect key="frame" x="471" y="7" width="121" height="29"/>
+                                                    <rect key="frame" x="431" y="7" width="161" height="29"/>
                                                     <segments>
-                                                        <segment title="First"/>
-                                                        <segment title="Second"/>
+                                                        <segment title="Red"/>
+                                                        <segment title="Yellow"/>
+                                                        <segment title="Blue"/>
                                                     </segments>
+                                                    <connections>
+                                                        <action selector="changeBricksColor:" destination="NKz-n4-6IH" eventType="valueChanged" id="ENz-zQ-Q6o"/>
+                                                    </connections>
                                                 </segmentedControl>
                                             </subviews>
                                             <constraints>
@@ -174,6 +173,9 @@
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="Rw2-Q5-RLl">
                                                     <rect key="frame" x="543" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="changeBricksColliderBehavior:" destination="NKz-n4-6IH" eventType="valueChanged" id="csu-Ma-z2L"/>
+                                                    </connections>
                                                 </switch>
                                             </subviews>
                                             <constraints>
@@ -199,6 +201,9 @@
                                                 </label>
                                                 <switch opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" contentHorizontalAlignment="center" contentVerticalAlignment="center" translatesAutoresizingMaskIntoConstraints="NO" id="9DK-IM-5QC">
                                                     <rect key="frame" x="543" y="6" width="51" height="31"/>
+                                                    <connections>
+                                                        <action selector="changeBricksGravityBehavior:" destination="NKz-n4-6IH" eventType="valueChanged" id="0rr-4I-SlH"/>
+                                                    </connections>
                                                 </switch>
                                             </subviews>
                                             <constraints>
@@ -227,11 +232,14 @@
                                                     <nil key="highlightedColor"/>
                                                 </label>
                                                 <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="4fg-MG-7ZI">
-                                                    <rect key="frame" x="471" y="7" width="121" height="29"/>
+                                                    <rect key="frame" x="463" y="7" width="129" height="29"/>
                                                     <segments>
-                                                        <segment title="First"/>
-                                                        <segment title="Second"/>
+                                                        <segment title="Black"/>
+                                                        <segment title="Random"/>
                                                     </segments>
+                                                    <connections>
+                                                        <action selector="changeBallColor:" destination="NKz-n4-6IH" eventType="valueChanged" id="Xnv-DE-EYd"/>
+                                                    </connections>
                                                 </segmentedControl>
                                             </subviews>
                                             <constraints>
@@ -279,7 +287,7 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" id="Jat-g0-dqH">
-                                        <rect key="frame" x="0.0" y="516" width="600" height="44"/>
+                                        <rect key="frame" x="0.0" y="515.5" width="600" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="Jat-g0-dqH" id="4to-9o-sxJ">
                                             <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
@@ -291,13 +299,13 @@
                                                     <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
                                                     <nil key="highlightedColor"/>
                                                 </label>
-                                                <slider opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.10000000000000001" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="hWb-JS-Ncy">
+                                                <slider opaque="NO" tag="4" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" value="0.10000000000000001" minValue="0.0" maxValue="1" translatesAutoresizingMaskIntoConstraints="NO" id="hWb-JS-Ncy">
                                                     <rect key="frame" x="476" y="7" width="118" height="31"/>
                                                     <constraints>
                                                         <constraint firstAttribute="width" constant="114" id="8Og-q1-N5P"/>
                                                     </constraints>
                                                     <connections>
-                                                        <action selector="increaseGravityForBall:" destination="NKz-n4-6IH" eventType="valueChanged" id="gC9-jq-vaD"/>
+                                                        <action selector="increaseGravityForBall:" destination="NKz-n4-6IH" eventType="valueChanged" id="Lm9-w7-Ik2"/>
                                                     </connections>
                                                 </slider>
                                                 <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="0.1" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="ngM-M0-fIR">
@@ -328,6 +336,7 @@
                     <navigationItem key="navigationItem" title="Settings" id="v6E-ei-S9u"/>
                     <connections>
                         <outlet property="ballRadiusLabel" destination="inV-8v-5Sc" id="eAW-74-emM"/>
+                        <outlet property="bricksAsColliderSwitch" destination="Rw2-Q5-RLl" id="mtv-oB-adA"/>
                         <outlet property="bricksHeightLabel" destination="wgv-Dd-YnP" id="J87-vU-r0o"/>
                         <outlet property="bricksPerRowLabel" destination="fPA-SA-N69" id="qej-Fr-SZw"/>
                         <outlet property="bricksRowLabel" destination="2n6-AU-8uX" id="oDj-g5-lAy"/>

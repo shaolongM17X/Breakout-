@@ -38,6 +38,10 @@ class BreakoutBehavior: UIDynamicBehavior {
 		ballItemBehavior.removeItem(ball)
 	}
 	
+	func updateGravity(magnitude: CGFloat) {
+		gravity.magnitude = magnitude
+	}
+	
 	// dealing with pausing and continuing game
 	private var ballLinearVelocity: CGPoint?
 	private var ballAngularVelocity: CGFloat?
@@ -60,6 +64,28 @@ class BreakoutBehavior: UIDynamicBehavior {
 		}
 	}
 	
+	func addBrickBehavior(item: UIDynamicItem, withIdentifier identifier: String, path: UIBezierPath) {
+		
+		
+		if Constants.BrickAffectedByGravity {
+			gravity.addItem(item)
+		}
+		if Constants.BrickAsCollider {
+			collider.addItem(item)
+		}
+		if !Constants.BrickAffectedByGravity && !Constants.BrickAsCollider {
+			addBarrier(path, named: identifier)
+		}
+		
+	}
+	
+	// remove all the behaviors possibly related with the brick
+	func removeBrickBehavior(item: UIDynamicItem, withIdentifier identifier: String) {
+		gravity.removeItem(item)
+		collider.removeItem(item)
+		removeBarrier(withIdentifier: identifier)
+	}
+	
 	override init() {
 		super.init()
 		addChildBehavior(gravity)
@@ -70,6 +96,10 @@ class BreakoutBehavior: UIDynamicBehavior {
 	func addBarrier(path: UIBezierPath, named name: String) {
 		collider.removeBoundaryWithIdentifier(name)
 		collider.addBoundaryWithIdentifier(name, forPath: path)
+	}
+	
+	func removeBarrier(withIdentifier identifier: String) {
+		collider.removeBoundaryWithIdentifier(identifier)
 	}
 
 }

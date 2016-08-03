@@ -15,12 +15,12 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	}
 	private var showingCoverView = true {
 		didSet {
-			if !showingCoverView {
+			if showingCoverView {
+				isPlaying = false
+			} else {
 				removeViewWithAnimation(coverView)
 				removeViewWithAnimation(coverText)
 				isPlaying = true
-			} else {
-				isPlaying = false
 			}
 		}
 	}
@@ -29,13 +29,15 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 			if isPlaying {
 				animating = true
 				continueGame()
+			} else {
+				animating = false
 			}
 		}
 	}
 	private var gameOver = false {
 		didSet {
 			if gameOver {
-				animating = false
+				isPlaying = false
 				showCoverViewWithText("Oh oh..Touch to restart")
 			} else {
 				showingCoverView = false
@@ -46,7 +48,7 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	private var winning = false {
 		didSet {
 			if winning {
-				animating = false
+				isPlaying = false
 				showCoverViewWithText("You win!")
 			} else {
 				showingCoverView = false
@@ -54,10 +56,23 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 			}
 		}
 	}
+	private var animating = false {
+		didSet {
+			if animating {
+				behavior.addBall(ballView)
+			} else {
+				behavior.removeBall(ballView)
+			}
+		}
+	}
 	private var coverView: UIView!
 	private var coverText: UILabel!
 	private func showCoverViewWithText(textToDisplay: String) {
 		showingCoverView = true
+		if coverView != nil && coverText != nil {
+			coverView.removeFromSuperview()
+			coverText.removeFromSuperview()
+		}
 		coverView = UIView(frame: frame)
 		coverView.backgroundColor = UIColor.blackColor()
 		coverView.alpha = 0.85
@@ -92,15 +107,7 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	
 	// behavior and animator
 	private lazy var animator: UIDynamicAnimator = UIDynamicAnimator(referenceView: self)
-	var animating = false {
-		didSet {
-			if animating {
-				behavior.addBall(ballView)
-			} else {
-				behavior.removeBall(ballView)
-			}
-		}
-	}
+	
 	
 	
 	private lazy var behavior: BreakoutBehavior = {
@@ -159,8 +166,15 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 		let frame = CGRect(origin: CGPoint(x: bounds.midX, y: bounds.midY), size: ballSize)
 		ballView = UIView(frame: frame)
 		ballView.layer.cornerRadius = frame.width / 2
-		ballView.backgroundColor = UIColor.blackColor()
+		ballView.backgroundColor = Constants.BallColor
 		addSubview(ballView)
+	}
+	
+	func updateBall() {
+		ballView.frame.size = ballSize
+		behavior.updateGravity(Constants.GravityForBall)
+		Constants.BallNeedsUpdate = false
+		animator.updateItemUsingCurrentState(ballView)
 	}
 	
 	// brick view 
@@ -174,31 +188,48 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	
 	
 	func prepareForBricks() {
+		removeCurrentBricks()
 		for rowNumber in 0..<Constants.BrickRows {
 			for colNumber in 0..<Constants.BricksPerRow {
 				drawBrickAtPosition(CGFloat(colNumber) * brickWidth, y: Constants.TopOffset + CGFloat(rowNumber) * Constants.BrickHeight)
 			}
 		}
 	}
+	
+	func updateBricks() {
+		removeCurrentBricks()
+		prepareForBricks()
+		Constants.ViewNeedsUpdate = false
+		if gameOver {
+			gameOver = false
+		} else if winning {
+			winning = false
+		} else {
+			showingCoverView = false
+		}
+		showCoverViewWithText("Touch to continue:")
+	}
+	
+	private func removeCurrentBricks() {
+		for (identifier, view) in bricks {
+			view.removeFromSuperview()
+			behavior.removeBrickBehavior(view, withIdentifier: identifier)
+		}
+		bricks.removeAll()
+	}
 
 	
 	private func drawBrickAtPosition(x: CGFloat, y: CGFloat) {
 		let identifier = "brick with x: \(x) and y: \(y)"
-		if bricks[identifier] == nil {
-			let frame = CGRect(origin: CGPoint(x: x,y: y), size: brickSize)
-			let brick = UIView(frame: frame)
-			
-			
-			brick.backgroundColor = Constants.BrickColor
-			brick.layer.borderWidth = 1
-			brick.layer.borderColor = UIColor.blackColor().CGColor
-			addSubview(brick)
-			
-			let path = UIBezierPath(rect: frame)
-			
-			behavior.addBarrier(path, named: identifier)
-			bricks[identifier] = brick
-		}
+		let frame = CGRect(origin: CGPoint(x: x,y: y), size: brickSize)
+		let brick = UIView(frame: frame)
+		brick.backgroundColor = Constants.BrickColor
+		brick.layer.borderWidth = 1
+		brick.layer.borderColor = UIColor.blackColor().CGColor
+		addSubview(brick)
+		bricks[identifier] = brick
+		let path = UIBezierPath(rect: frame)
+		behavior.addBrickBehavior(brick, withIdentifier: identifier, path: path)
 	}
 	
 	// paddle
@@ -250,15 +281,15 @@ class PlayView: UIView, UICollisionBehaviorDelegate {
 	}
 	//		Tap
 	func userTapScreen(recognizer: UITapGestureRecognizer) {
-		if gameOver {
-			gameOver = false
-		} else if winning {
-			winning = false
+		if isPlaying {
+			pushTheBall(recognizer)
 		} else {
-			if showingCoverView {
+			if gameOver {
+				gameOver = false
+			} else if winning {
+				winning = false
+			} else {
 				showingCoverView = false
-			} else if isPlaying {
-				pushTheBall(recognizer)
 			}
 		}
 	}

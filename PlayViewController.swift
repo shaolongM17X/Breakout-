@@ -30,7 +30,13 @@ class PlayViewController: UIViewController {
 		if initialize {
 			playView.initializeGame()
 			initialize = false
-		}		
+		}
+		if Constants.ViewNeedsUpdate {
+			playView.updateBricks()
+		}
+		if Constants.BallNeedsUpdate {
+			playView.updateBall()
+		}
 	}
 	
 	override func viewWillDisappear(animated: Bool) {
