@@ -11,7 +11,7 @@ import UIKit
 class BreakoutBehavior: UIDynamicBehavior {
 	private let gravity: UIGravityBehavior = {
 		let gravity = UIGravityBehavior()
-		gravity.magnitude = 0.1
+		gravity.magnitude = Constants.GravityForBall
 		return gravity
 	}()
 	let collider: UICollisionBehavior = {

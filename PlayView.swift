@@ -9,22 +9,6 @@
 import UIKit
 
 class PlayView: UIView, UICollisionBehaviorDelegate {
-	private struct Constants {
-		// Constants related to Bricks
-		static let BricksPerRow = 1
-		static let BrickRows = 1
-		static let BrickHeight: CGFloat = 20
-		static let TopOffset: CGFloat = 60
-		static let BrickColor: UIColor = UIColor.redColor()
-		// Constants related to Paddle
-		static let BottomOffset: CGFloat = 30
-		static let PaddleWidth: CGFloat = 60
-		static let PaddleHeight: CGFloat = 10
-		// Constants related to Ball
-		static let BallRadius: CGFloat = 10
-		// Constants with push behavior
-		static let PushMagnitude: CGFloat = 0.2
-	}
 	
 	private struct Identifiers {
 		static let PaddleBoundaryIdentifier = "paddle boundary"
